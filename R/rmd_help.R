@@ -13,7 +13,7 @@
 #' \dontrun{
 #' rmd_help(help)
 #' }
-rmd_help <- function(topic, package = NULL) {
+rmd_help <- function(topic, package = NULL, lspmode = FALSE) {
   the_topic <- deparse(substitute(topic))
   is_namespaced <- grepl(":{2,3}", the_topic)
   help_call_args <- list()
@@ -95,7 +95,11 @@ rmd_help <- function(topic, package = NULL) {
 
   rmd_help <- c(paste0("# {", help_file_folder, "} / ", help_file_name), "", rmd_help)
   readr::write_file(paste0(rmd_help, collapse = "\n"), target_file)
-  rstudioapi::navigateToFile(target_file)
+  if (lspmode) {
+    return(target_file)
+  } else {
+    rstudioapi::navigateToFile(target_file)
+  }
 }
 
 get_pkg_user_dir <- function() {
