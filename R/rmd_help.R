@@ -14,7 +14,11 @@
 #' rmd_help(help)
 #' }
 rmd_help <- function(topic, package = NULL, lspmode = FALSE) {
-  the_topic <- deparse(substitute(topic))
+  if (lspmode) {
+    the_topic <- topic
+  } else {
+    the_topic <- deparse(substitute(topic))
+  }
   is_namespaced <- grepl(":{2,3}", the_topic)
   help_call_args <- list()
   if (is_namespaced && !is.null(package)) package <- NULL ## namespace takes priority
@@ -33,7 +37,11 @@ rmd_help <- function(topic, package = NULL, lspmode = FALSE) {
   help_file_name <- fs::path_file(help_file)
   help_file_path_split <- fs::path_split(help_file)[[1]]
   help_file_folder <- help_file_path_split[[length(help_file_path_split) - 2]] # <pkg_folder>/help
-  pkg_user_dir <- get_pkg_user_dir()
+  if (lspmode) {
+    pkg_user_dir <- "/tmp/"
+  } else {
+    pkg_user_dir <- get_pkg_user_dir()
+  }
   target_file_name <- paste0(help_file_name, "_help.rmd")
   target_file <- fs::file_create(file.path(pkg_user_dir, target_file_name))
 
@@ -56,7 +64,6 @@ rmd_help <- function(topic, package = NULL, lspmode = FALSE) {
       readLines(target_file, encoding = "UTF-8"),
       collapse = "\n"
       )
-
 
   ## Set headings to markdown style
   with_headings <- gsub(
